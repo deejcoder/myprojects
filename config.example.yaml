@@ -1,0 +1,11 @@
+version: v1.0.0
+loglevel: "info"
+
+api:
+    port: 8080
+    secret_key: ""
+db:
+    host: localhost
+    port: 27017
+    database: myprojects
+    user: myprojects
