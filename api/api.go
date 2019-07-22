@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/Dilicor/myprojects/config"
-	"github.com/Dilicor/myprojects/storage"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -49,8 +48,6 @@ func Serve(ctx context.Context) {
 	if err := s.ListenAndServe(); err != http.ErrServerClosed {
 		log.Error(err)
 	}
-
-	storage.Connect(ctx, cfg.Database.Host, cfg.Database.Port, cfg.Database.Database, cfg.Database.User, "")
 
 	<-done
 }

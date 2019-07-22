@@ -4,8 +4,10 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"sync"
 
 	"github.com/Dilicor/myprojects/api"
+	"github.com/Dilicor/myprojects/storage"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -31,9 +33,24 @@ var serveCommand = &cobra.Command{
 			cancel()
 		}()
 
-		// cancel the context when the webserver exits
-		defer cancel()
-		api.Serve(ctx)
+		var waitGroup sync.WaitGroup
+		waitGroup.Add(2)
+
+		go func() {
+			defer waitGroup.Done()
+			defer cancel()
+
+			api.Serve(ctx)
+		}()
+
+		go func() {
+			defer waitGroup.Done()
+			defer cancel()
+
+			storage.Connect(ctx)
+		}()
+
+		waitGroup.Wait()
 
 		return nil
 	},
