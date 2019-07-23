@@ -6,16 +6,14 @@ import (
 	"net/http"
 
 	"github.com/Dilicor/myprojects/config"
+	"github.com/Dilicor/myprojects/storage"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
 
-// Serve starts the webserver, terminates on request
-func Serve(ctx context.Context) {
-	cfg := config.GetConfig()
-
-	// cross origin resource sharing restrictions
+func configure(ac *AppContext) *http.Server {
+	// cross origin resource sharing rules
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}),
 		handlers.AllowedMethods([]string{"GET"}),
@@ -27,25 +25,39 @@ func Serve(ctx context.Context) {
 	router.HandleFunc("/projects", getProjects).Methods("GET")
 	router.HandleFunc("/project/{slug}", getProject).Methods("GET")
 
-	// init webserver
+	// configure server
 	s := &http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.API.Port),
-		Handler: cors(router),
+		Addr:    fmt.Sprintf(":%d", ac.Config.API.Port),
+		Handler: AppContextHandler(ac, cors(router)),
 	}
+
+	return s
+}
+
+// Start starts the webserver, terminates on request
+func Start(ctx context.Context) {
+
+	db := storage.Connect()
+	appContext := AppContext{
+		Db:     db,
+		Config: config.GetConfig(),
+	}
+
+	server := configure(&appContext)
 
 	// listen for interupt signal
 	done := make(chan struct{})
 	go func() {
 		<-ctx.Done()
-		if err := s.Shutdown(context.Background()); err != nil {
+		if err := server.Shutdown(context.Background()); err != nil {
 			log.Error(err)
 		}
 		close(done)
 	}()
 
 	// start webserver
-	log.Infof("Serving web api on http://localhost:%d", cfg.API.Port)
-	if err := s.ListenAndServe(); err != http.ErrServerClosed {
+	log.Infof("Starting REST api on http://localhost:%d", appContext.Config.API.Port)
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
 		log.Error(err)
 	}
 
