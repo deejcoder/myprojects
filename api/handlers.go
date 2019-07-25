@@ -3,25 +3,30 @@ package api
 import (
 	"context"
 	"net/http"
-
-	"github.com/Dilicor/myprojects/config"
+	"time"
 
 	log "github.com/sirupsen/logrus"
-
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-// AppContext stores shared application data for use within Requests
-type AppContext struct {
-	Db     *mongo.Database
-	Config *config.Config
-}
 
 type appContextKey struct{}
 
-// AppContextHandler adds the application context (AppContext) to a Request
-func AppContextHandler(appContext *AppContext, next http.Handler) http.Handler {
+func handler(appContext *AppContext, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		// simple logging
+		startTime := time.Now()
+		defer func() {
+			log.WithFields(log.Fields{
+				"remote":   r.RemoteAddr,
+				"duration": time.Since(startTime),
+			}).Infof("%s %s", r.Method, r.URL.RequestURI())
+
+		}()
+
+		// only return JSON responses
+		w.Header().Set("Content-Type", "application/json")
+
+		// add AppContext to request context for access within requests
 		ctx := context.WithValue(r.Context(), appContextKey{}, appContext)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

@@ -10,7 +10,14 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
 )
+
+// AppContext stores shared application data for use within Requests
+type AppContext struct {
+	Db     *mongo.Database
+	Config *config.Config
+}
 
 func configure(ac *AppContext) *http.Server {
 	// cross origin resource sharing rules
@@ -28,7 +35,7 @@ func configure(ac *AppContext) *http.Server {
 	// configure server
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", ac.Config.API.Port),
-		Handler: AppContextHandler(ac, cors(router)),
+		Handler: handler(ac, cors(router)),
 	}
 
 	return s

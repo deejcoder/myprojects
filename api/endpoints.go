@@ -4,16 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Dilicor/myprojects/config"
-	log "github.com/sirupsen/logrus"
+	"github.com/Dilicor/myprojects/storage"
 )
 
 func getProjects(w http.ResponseWriter, r *http.Request) {
 	ac := GetAppContext(r)
+	col := ac.Db.Collection("projects")
 
-	log.Infof("DB: %s", ac.Db.Name())
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(config.GetConfig())
+	storage.AddProject(col, "asyncbots", "completed", make([]string, 0), "something special")
+	json.NewEncoder(w).Encode(storage.GetProjects(ac.Db.Collection("projects")))
 }
 
 func getProject(w http.ResponseWriter, r *http.Request) {
