@@ -24,11 +24,12 @@ type Project struct {
 }
 
 // GetProject finds a project by project ID, and returns it. If not found, nil.
-func GetProject(col *mongo.Collection, id primitive.ObjectID) *Project {
-	filter := bson.M{"_id": id}
+func GetProject(col *mongo.Collection, id string) *Project {
+	oid, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": oid}
 
 	var project *Project
-	if err := col.FindOne(context.TODO(), filter).Decode(project); err != nil {
+	if err := col.FindOne(context.TODO(), filter).Decode(&project); err != nil {
 		log.Error(err)
 		return nil
 	}

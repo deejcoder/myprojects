@@ -30,7 +30,7 @@ func configure(ac *AppContext) *http.Server {
 	// endpoints
 	router := mux.NewRouter()
 	router.HandleFunc("/projects", getProjectList).Methods("GET")
-	router.HandleFunc("/project/{slug}", getProject).Methods("GET")
+	router.HandleFunc("/project/{id}", getProject).Methods("GET")
 
 	// configure server
 	s := &http.Server{
