@@ -7,7 +7,7 @@ import (
 	"github.com/Dilicor/myprojects/storage"
 )
 
-func getProjects(w http.ResponseWriter, r *http.Request) {
+func getProjectList(w http.ResponseWriter, r *http.Request) {
 	ac := GetAppContext(r)
 	col := ac.Db.Collection("projects")
 

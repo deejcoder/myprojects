@@ -10,15 +10,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Project simply represents a project
+// Project represents a Project
 type Project struct {
-	ID           primitive.ObjectID `bson:"_id"`
-	Title        string             `bson:"title"`
-	Status       string             `bson:"status"`
-	Tags         []string           `bson:"tags"`
-	DateCreated  time.Time          `bson:"date_created"`
-	DateModified time.Time          `bson:"date_modified"`
-	Summary      string             `bson:"summary"`
+	ID           primitive.ObjectID `json:"_id" bson:"_id"`
+	Title        string             `json:"title" bson:"title"`
+	Status       string             `json:"status" bson:"status"`
+	Tags         []string           `json:"tags" bson:"tags"`
+	DateCreated  time.Time          `json:"date_created" bson:"date_created"`
+	DateModified time.Time          `json:"date_modified" bson:"date_modified"`
+	Summary      string             `json:"summary" bson:"summary"`
+	ProjectLink  string             `json:"projectLink" bson:"projectLink"`
+	Content      string             `json:"content" bson:"content"`
 }
 
 // GetProject finds a project by project ID, and returns it. If not found, nil.
@@ -33,7 +35,7 @@ func GetProject(col *mongo.Collection, id primitive.ObjectID) *Project {
 	return project
 }
 
-// GetProjects returns all projects currently stored in the collection
+// GetProjects returns all projects
 func GetProjects(col *mongo.Collection) []*Project {
 	projects := make([]*Project, 0)
 
@@ -45,6 +47,7 @@ func GetProjects(col *mongo.Collection) []*Project {
 
 	defer cursor.Close(context.TODO())
 
+	// fetch a project from mongo
 	for cursor.Next(context.TODO()) {
 		var project Project
 		if err := cursor.Decode(&project); err != nil {
@@ -59,26 +62,5 @@ func GetProjects(col *mongo.Collection) []*Project {
 	if err := cursor.Err(); err != nil {
 		log.Error(err)
 	}
-
 	return projects
-}
-
-// AddProject adds a project to mongodb and returns the ID assigned to this new document
-func AddProject(col *mongo.Collection, title string, status string, tags []string, summary string) string {
-
-	result, err := col.InsertOne(context.TODO(), bson.M{
-		"title":         title,
-		"status":        status,
-		"tags":          tags,
-		"summary":       summary,
-		"date_created":  time.Now(),
-		"date_modified": time.Now(),
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	pid := result.InsertedID.(primitive.ObjectID).Hex()
-	log.Infof("Created new project, %s (%s)", title, pid)
-	return pid
 }
