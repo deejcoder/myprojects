@@ -23,7 +23,6 @@ func getProject(w http.ResponseWriter, r *http.Request) {
 	ac := GetAppContext(r)
 	col := ac.Db.Collection("projects")
 	params := mux.Vars(r)
-
 	id := params["id"]
 
 	json.NewEncoder(w).Encode(storage.GetProject(col, id))
@@ -32,6 +31,7 @@ func getProject(w http.ResponseWriter, r *http.Request) {
 func editProject(w http.ResponseWriter, r *http.Request) {
 
 	if authorized := ValidateAuthorization(w, r); !authorized {
+		http.Error(w, "Not authorized", http.StatusForbidden)
 		return
 	}
 
@@ -64,4 +64,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, "Authentication failed", http.StatusForbidden)
+}
+
+// validate checks if some token is valid and returns a JSON response
+func validate(w http.ResponseWriter, r *http.Request) {
+	var response struct {
+		Validated bool `json:"validated"`
+	}
+	response.Validated = ValidateAuthorization(w, r)
+	json.NewEncoder(w).Encode(response)
 }

@@ -19,7 +19,6 @@ func ValidateAuthorization(w http.ResponseWriter, r *http.Request) bool {
 
 	// test for result
 	if len(match) <= 1 {
-		http.Error(w, "Invalid or malformed token", http.StatusForbidden)
 		return false
 	}
 
@@ -36,7 +35,5 @@ func ValidateAuthorization(w http.ResponseWriter, r *http.Request) bool {
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return true
 	}
-
-	http.Error(w, "Invalid or malformed token", http.StatusForbidden)
 	return false
 }

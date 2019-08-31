@@ -33,6 +33,7 @@ func configure(ac *AppContext) *http.Server {
 	router.HandleFunc("/project/{id}/", getProject).Methods("GET")
 	router.HandleFunc("/project/{id}/edit", editProject).Methods("GET")
 	router.HandleFunc("/auth/login", login).Methods("POST")
+	router.HandleFunc("/auth/validate", validate).Methods("GET")
 
 	// configure server
 	s := &http.Server{
