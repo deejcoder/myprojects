@@ -23,7 +23,7 @@ func configure(ac *AppContext) *http.Server {
 	// cross origin resource sharing rules
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}),
-		handlers.AllowedMethods([]string{"GET"}),
+		handlers.AllowedMethods([]string{"GET", "POST"}),
 		handlers.AllowedHeaders([]string{"Content-Type"}),
 	)
 
