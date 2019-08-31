@@ -1,5 +1,7 @@
 version: v1.0.0
 loglevel: "info"
+jwt_secret: "someverysecretkey"
+admin_secret: "somesecretpassword"
 
 api:
     port: 8080

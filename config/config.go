@@ -11,10 +11,12 @@ import (
 
 // Config wraps the config file as a struct
 type Config struct {
-	Version  string
-	LogLevel logrus.Level
-	API      apiConfig
-	Database databaseConfig
+	Version     string
+	LogLevel    logrus.Level
+	JwtSecret   string
+	AdminSecret string
+	API         apiConfig
+	Database    databaseConfig
 }
 
 type apiConfig struct {
@@ -33,6 +35,8 @@ type databaseConfig struct {
 func (cfg *Config) init() {
 	cfg.Version = viper.GetString("version")
 	cfg.setLogLevel(viper.GetString("loglevel"))
+	cfg.JwtSecret = viper.GetString("jwt_secret")
+	cfg.AdminSecret = viper.GetString("admin_secret")
 	cfg.API.Port = viper.GetInt("api.port")
 	cfg.API.SecretKey = viper.GetString("api.secret_key")
 	cfg.Database.Host = viper.GetString("db.host")
