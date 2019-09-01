@@ -24,7 +24,7 @@ func configure(ac *AppContext) *http.Server {
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}),
 		handlers.AllowedMethods([]string{"GET", "POST"}),
-		handlers.AllowedHeaders([]string{"Content-Type"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
 
 	// endpoints
