@@ -31,7 +31,7 @@ func configure(ac *AppContext) *http.Server {
 	router := mux.NewRouter()
 	router.HandleFunc("/projects", getProjectList).Methods("GET")
 	router.HandleFunc("/project/{id}/", getProject).Methods("GET")
-	router.HandleFunc("/project/{id}/edit", editProject).Methods("GET")
+	router.HandleFunc("/project/{id}/update", auth(onUpdateProject)).Methods("POST")
 	router.HandleFunc("/auth/login", login).Methods("POST")
 	router.HandleFunc("/auth/validate", validate).Methods("GET")
 

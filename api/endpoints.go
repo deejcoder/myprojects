@@ -2,8 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/Dilicor/myprojects/config"
@@ -14,28 +14,37 @@ import (
 
 func getProjectList(w http.ResponseWriter, r *http.Request) {
 	ac := GetAppContext(r)
-	col := ac.Db.Collection("projects")
 
-	json.NewEncoder(w).Encode(storage.GetProjects(col))
+	json.NewEncoder(w).Encode(storage.GetProjects(ac.Db))
 }
 
 func getProject(w http.ResponseWriter, r *http.Request) {
 	ac := GetAppContext(r)
-	col := ac.Db.Collection("projects")
 	params := mux.Vars(r)
 	id := params["id"]
 
-	json.NewEncoder(w).Encode(storage.GetProject(col, id))
+	json.NewEncoder(w).Encode(storage.GetProject(ac.Db, id))
 }
 
-func editProject(w http.ResponseWriter, r *http.Request) {
+func onUpdateProject(w http.ResponseWriter, r *http.Request) {
+	ac := GetAppContext(r)
 
-	if authorized := ValidateAuthorization(w, r); !authorized {
-		http.Error(w, "Not authorized", http.StatusForbidden)
-		return
+	var response struct {
+		FormErrors url.Values `json:"formErrors"`
 	}
 
-	fmt.Fprintln(w, "In progress")
+	var editedProject *storage.Project
+	err := json.NewDecoder(r.Body).Decode(&editedProject)
+	if err != nil {
+		response.FormErrors.Add("none", "Internal error: unable to decode JSON request")
+	}
+
+	response.FormErrors = storage.UpdateProject(ac.Db, editedProject)
+
+	if len(response.FormErrors) > 0 {
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
 func login(w http.ResponseWriter, r *http.Request) {

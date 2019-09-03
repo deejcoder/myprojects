@@ -41,3 +41,13 @@ func GetAppContext(r *http.Request) *AppContext {
 	}
 	return ac
 }
+
+func auth(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if authorized := ValidateAuthorization(w, r); !authorized {
+			http.Error(w, "Not authorized", http.StatusForbidden)
+			return
+		}
+		h(w, r)
+	}
+}
