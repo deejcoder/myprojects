@@ -23,7 +23,7 @@ func configure(ac *AppContext) *http.Server {
 	// cross origin resource sharing rules
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}),
-		handlers.AllowedMethods([]string{"GET", "POST"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "DELETE"}),
 		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
 
@@ -32,6 +32,7 @@ func configure(ac *AppContext) *http.Server {
 	router.HandleFunc("/projects", getProjectList).Methods("GET")
 	router.HandleFunc("/project/{id}/", getProject).Methods("GET")
 	router.HandleFunc("/project/{id}/update", auth(onUpdateProject)).Methods("POST")
+	router.HandleFunc("/project/{id}/delete", auth(onDeleteProject)).Methods("DELETE")
 	router.HandleFunc("/auth/login", login).Methods("POST")
 	router.HandleFunc("/auth/validate", validate).Methods("GET")
 

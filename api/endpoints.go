@@ -47,6 +47,16 @@ func onUpdateProject(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func onDeleteProject(w http.ResponseWriter, r *http.Request) {
+	db := GetAppContext(r).Db
+	params := mux.Vars(r)
+	id := params["id"]
+
+	if deleted := storage.DeleteProject(db, id); !deleted {
+		w.WriteHeader(http.StatusNotFound)
+	}
+}
+
 func login(w http.ResponseWriter, r *http.Request) {
 
 	// get the provided secret key
