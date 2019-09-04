@@ -12,30 +12,39 @@ import (
 	"github.com/gorilla/mux"
 )
 
+/* getProjectList
+GET /projects, returns all projects
+*/
 func getProjectList(w http.ResponseWriter, r *http.Request) {
 	ac := GetAppContext(r)
+	response := reply.NewReply()
 
 	projects := storage.GetProjects(ac.Db)
-
-	response := reply.Response{Ok: true, Message: "Obtained project list"}
-	response.Commit(w, projects)
+	response.Success(w, "Obtained project list", projects)
 }
 
+/* getProject
+GET /project/{id}/ returns data for a particular project
+*/
 func getProject(w http.ResponseWriter, r *http.Request) {
 	ac := GetAppContext(r)
 	params := mux.Vars(r)
 	id := params["id"]
+	response := reply.NewReply()
 
 	project := storage.GetProject(ac.Db, id)
-	response := reply.Response{Ok: true, Message: "Obtained project information"}
-	response.Commit(w, project)
+	response.Success(w, "Obtained project information", project)
 }
 
+/* onUpdateProject
+POST /project/{id}/update, with new project data in the request body,
+replaces an existing project
+*/
 func onUpdateProject(w http.ResponseWriter, r *http.Request) {
 	ac := GetAppContext(r)
 	resp := reply.NewReply()
 
-	// decode the new project
+	// get the project
 	var newProject *storage.Project
 	err := json.NewDecoder(r.Body).Decode(&newProject)
 	if err != nil {
@@ -43,7 +52,7 @@ func onUpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check if project consists of valid data
+	// check if project is valid
 	if valid := newProject.Validate(&resp); !valid {
 		resp.Error(w, "There were validation error(s) when updating the project", reply.ErrorValidationError)
 		return
@@ -58,6 +67,9 @@ func onUpdateProject(w http.ResponseWriter, r *http.Request) {
 	resp.Success(w, "The project was successfully updated", nil)
 }
 
+/* onDeleteProject
+DELETE /project/{id}/delete, deletes a project by ID
+*/
 func onDeleteProject(w http.ResponseWriter, r *http.Request) {
 	db := GetAppContext(r).Db
 	params := mux.Vars(r)
@@ -73,10 +85,13 @@ func onDeleteProject(w http.ResponseWriter, r *http.Request) {
 	resp.Success(w, "Project was deleted successfully", nil)
 }
 
+/* login
+POST /auth/login, client provides secret_key (passphase), returns token
+*/
 func login(w http.ResponseWriter, r *http.Request) {
 	resp := reply.NewReply()
 
-	// get the provided secret key
+	// get the secret key
 	var content struct {
 		SecretKey string `json:"secret_key"`
 	}
@@ -89,11 +104,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 		})
 		tkString, _ := tk.SignedString([]byte(config.GetConfig().JwtSecret))
 
-		// encode response as JSON
 		var response struct {
 			Token string `json:"token"`
 		}
-
 		response.Token = tkString
 		resp.Success(w, "Login validated", response)
 		return
@@ -102,7 +115,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 	resp.Error(w, "Authentication failed", reply.ErrorNotAuthorized)
 }
 
-// validate checks if some token is valid and returns a JSON response
+/* validate
+GET /auth/validate returns true/false if client has valid jwt token
+*/
 func validate(w http.ResponseWriter, r *http.Request) {
 	resp := reply.NewReply()
 	if validated := ValidateAuthorization(w, r); !validated {
