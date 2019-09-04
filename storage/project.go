@@ -2,10 +2,10 @@ package storage
 
 import (
 	"context"
-	"net/url"
 	s "strings"
 	"time"
 
+	reply "github.com/Dilicor/myprojects/reply"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -29,31 +29,30 @@ func setCollection(db *mongo.Database) *mongo.Collection {
 	return db.Collection("projects")
 }
 
-// Valid validates if all project fields are valid, returns list of errors
-func (p *Project) Valid() url.Values {
-	errors := url.Values{}
+// Validate validates if all project fields are valid, returns list of errors
+func (p *Project) Validate(r *reply.Response) bool {
 
 	if len(p.Title) < 5 || len(p.Title) > 80 {
-		errors.Add("title", "The title should be between 5 and 80 characters long")
+		r.AddValidationError("title", "Title should be between 5 and 80 characters long")
 	}
 
 	if !(s.Contains(p.Status, "In progress") || s.Contains(p.Status, "Completed")) {
-		errors.Add("status", "The project status must be 'in progress' or 'completed'")
+		r.AddValidationError("status", "The project status must be 'in progress' or 'completed'")
 	}
 
 	if len(p.Tags) > 8 {
-		errors.Add("tags", "You may only have 8 project tags")
+		r.AddValidationError("tags", "You may only have 8 project tags")
 	}
 
 	if len(p.Summary) < 50 || len(p.Summary) > 350 {
-		errors.Add("summary", "Project summary should be between 50 and 350 characters long")
+		r.AddValidationError("summary", "Project summary should be between 50 and 350 characters long")
 	}
 
 	if len(p.Content) < 50 || len(p.Content) > 10000 {
-		errors.Add("content", "The project content should be between 50 and 10000 characters")
+		r.AddValidationError("content", "The project content should be between 50 and 10000 characters")
 	}
 
-	return errors
+	return !r.HasValidationErrors()
 }
 
 // GetProject finds a project by project ID, and returns it. If not found, nil.
@@ -107,23 +106,16 @@ func GetProjects(db *mongo.Database) []*Project {
 }
 
 // UpdateProject updates an existing project, returns a list of form errors & if project was updated
-func UpdateProject(db *mongo.Database, project *Project) url.Values {
+func UpdateProject(db *mongo.Database, project *Project) bool {
 	col := setCollection(db)
-
-	errors := project.Valid()
-
-	// if any errors in project validation, return before updating doc
-	if len(errors) > 0 {
-		return errors
-	}
 
 	filter := bson.M{"_id": project.ID}
 	result := col.FindOneAndReplace(context.TODO(), filter, project)
 	if result.Err() != nil {
 		log.Error(result.Err())
-		return errors
+		return false
 	}
-	return errors
+	return true
 }
 
 // DeleteProject removes an existing project
@@ -139,6 +131,7 @@ func DeleteProject(db *mongo.Database, id string) bool {
 
 	doc := col.FindOneAndDelete(context.TODO(), filter)
 	if err := doc.Err(); err != nil {
+		log.Error(err)
 		return false
 	}
 	return true
