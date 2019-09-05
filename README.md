@@ -1,6 +1,7 @@
 # myprojects-api
 
 This is the main repository for the backend of the `myprojects` project. This project will allow software developers to showcase their software projects. This web application will allow the host (software developer, or system administrator), to edit, delete and create projects. A project will be able to have images attached to it, and embedded within the content.
+For the frontend, refer to [this](https://github.com/deejcoder/myprojects-http) repository.
 
 ## services
 
