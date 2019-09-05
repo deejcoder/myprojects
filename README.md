@@ -30,3 +30,38 @@ The backend uses MongoDB as a NoSQL DMS. All database logic has been thrown into
 
 ### configuration
 To configure this web app, you may modify `config.example.yaml`, and rename it to `config.yaml`, however avoid sharing this file.
+
+## deployment
+First build the Go project on the local machine,
+`GOOS=linux GOARCH=amd64 go build` and transfer it to the remote machine.
+
+Then execute the following commands on the remote machine,
+```bash
+mkdir -p /home/apps/myprojects
+mv /path/to/myprojects ./ // (executable)
+mv /path/to/config.yaml ./
+chown u+x ./myprojects
+
+// install mongodb
+apt-get install gnupg2
+wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+echo "deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.2 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+apt-get update
+
+// if using Debian Buster, you require packages from Debian Stretch
+echo "deb http://deb.debian.org/debian/ stretch main" | tee /etc/apt/sources.list.d/debian-stretch.list
+apt get update
+apt get install libcurl3
+
+apt-get install -y mongodb-org
+
+// restart and enable mongodb service
+systemctl start mongod
+systemctl enable mongod
+
+// TODO: install and configure PM2 for the API, for now use nohup to serve the API ...
+nohup ./myprojects serve &
+```
+
+You should now be able to visit the API by visiting http://{domain}:8080
+HTTPS will be implemented in the future.
