@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Dilicor/myprojects/cmd"
+	"github.com/deejcoder/myprojects/cmd"
 )
 
 func main() {

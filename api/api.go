@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Dilicor/myprojects/config"
-	"github.com/Dilicor/myprojects/storage"
+	"github.com/deejcoder/myprojects/config"
+	"github.com/deejcoder/myprojects/storage"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"

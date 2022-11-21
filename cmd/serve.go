@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/Dilicor/myprojects/api"
+	"github.com/deejcoder/myprojects/api"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

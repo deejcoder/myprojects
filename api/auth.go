@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/Dilicor/myprojects/config"
+	"github.com/deejcoder/myprojects/config"
 	"github.com/dgrijalva/jwt-go"
 )
 

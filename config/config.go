@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -12,7 +11,7 @@ import (
 // Config wraps the config file as a struct
 type Config struct {
 	Version     string
-	LogLevel    logrus.Level
+	LogLevel    log.Level
 	JwtSecret   string
 	AdminSecret string
 	API         apiConfig
@@ -76,10 +75,10 @@ func InitConfig() (*Config, error) {
 func (cfg *Config) setLogLevel(loglevel string) {
 	switch loglevel {
 	case "info":
-		cfg.LogLevel = logrus.InfoLevel
+		cfg.LogLevel = log.InfoLevel
 	case "warn":
-		cfg.LogLevel = logrus.WarnLevel
+		cfg.LogLevel = log.WarnLevel
 	case "fatal":
-		cfg.LogLevel = logrus.FatalLevel
+		cfg.LogLevel = log.FatalLevel
 	}
 }

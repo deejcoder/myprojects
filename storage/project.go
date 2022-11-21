@@ -5,7 +5,7 @@ import (
 	s "strings"
 	"time"
 
-	reply "github.com/Dilicor/myprojects/reply"
+	reply "github.com/deejcoder/myprojects/reply"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

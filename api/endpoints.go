@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Dilicor/myprojects/config"
-	reply "github.com/Dilicor/myprojects/reply"
-	"github.com/Dilicor/myprojects/storage"
+	"github.com/deejcoder/myprojects/config"
+	reply "github.com/deejcoder/myprojects/reply"
+	"github.com/deejcoder/myprojects/storage"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 )
