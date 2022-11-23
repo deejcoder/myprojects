@@ -62,6 +62,9 @@ systemctl enable mongod
 
 // TODO: install and configure PM2 for the API, for now use nohup to serve the API ...
 nohup ./myprojects serve &
+
+// allow port 8080
+sudo ufw allow 8080
 ```
 
 You should now be able to visit the API by visiting http://{domain}:8080
